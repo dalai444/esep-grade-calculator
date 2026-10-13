@@ -77,21 +77,33 @@ func (gc *GradeCalculator) AddGrade(name string, grade int, gradeType GradeType)
 	}
 }
 
+const (
+	assignmentWeight = 50
+	examWeight       = 35
+	essayWeight      = 15
+)
+
 func (gc *GradeCalculator) calculateNumericalGrade() int {
 	assignment_average := computeAverage(gc.assignments)
 	exam_average := computeAverage(gc.exams)
-	essay_average := computeAverage(gc.exams)
+	essay_average := computeAverage(gc.essays)
 
-	weighted_grade := float64(assignment_average)*.5 + float64(exam_average)*.35 + float64(essay_average)*.15
+	weighted_grade := (assignment_average*assignmentWeight +
+		exam_average*examWeight +
+		essay_average*essayWeight) / 100
 
-	return int(weighted_grade)
+	return weighted_grade
 }
 
 func computeAverage(grades []Grade) int {
+	if len(grades) == 0 {
+		return 0
+	}
+
 	sum := 0
 
-	for grade, _ := range grades {
-		sum += grade
+	for _, grade := range grades {
+		sum += grade.Grade
 	}
 
 	return sum / len(grades)
